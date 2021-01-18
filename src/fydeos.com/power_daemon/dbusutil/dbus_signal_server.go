@@ -7,12 +7,12 @@ import (
   "github.com/godbus/dbus"
 )
 
-const {
+const (
   dbusInterface = "org.chromium.PowerManager"
   dbusPath = "/org/chromium/PowerManager"
   dbusSender = "org.chromium.PowerManager"
   debug = true
-}
+)
 
 type SignalHandler func(*dbus.Signal) error
 

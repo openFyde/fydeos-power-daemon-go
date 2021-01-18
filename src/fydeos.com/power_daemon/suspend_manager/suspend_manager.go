@@ -31,7 +31,7 @@ func dPrintln(a ...interface{}) {
 }
 //Debug related end
 
-const {
+const (
   dbusInterface = "org.chromium.PowerManager"
   sigSuspendImminent = "SuspendImminent"
   sigSuspendDone = "SuspendDone"
@@ -42,7 +42,7 @@ const {
   pathPostResumeScript = "/etc/powerd/post_resume.sh"
   serverDescription = "FydeOS Suspend Manager"
   execTimeout = 200
-}
+)
 
 type SuspendManager struct {
   ctx *context.Context

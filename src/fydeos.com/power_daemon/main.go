@@ -12,11 +12,6 @@ import (
   "fydeos.com/power_daemon/suspend_manager"
 )
 
-const {
-  dbusName = "org.chromium.PowerManager"
-  dbusPath = "/org/chromium/PowerManager"
-}
-
 // Debug related begin
 const debug = true
 
