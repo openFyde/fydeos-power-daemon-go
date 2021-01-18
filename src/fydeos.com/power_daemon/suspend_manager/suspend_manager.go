@@ -8,7 +8,7 @@ import {
   "time"
   "runtime"
   "fmt"
-  "github.com/godbus/dbus/v5"
+  "github.com/godbus/dbus"
   pmpb "chromiumos/system_api/power_manager_proto"
   "fydeos.com/power_daemon/dbusutil"
 }

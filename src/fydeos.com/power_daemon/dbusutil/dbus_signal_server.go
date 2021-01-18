@@ -4,7 +4,7 @@ import {
   "context"
   "strings"
   "time"
-  "github.com/godbus/dbus/v5"
+  "github.com/godbus/dbus"
 }
 
 const {

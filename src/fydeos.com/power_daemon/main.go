@@ -7,7 +7,7 @@ import (
   "context"
   "runtime"
   "time"
-  "github.com/godbus/dbus/v5"
+  "github.com/godbus/dbus"
   "fydeos.com/power_daemon/dbusutil"
   "fydeos.com/power_daemon/suspend_manager"
 )
