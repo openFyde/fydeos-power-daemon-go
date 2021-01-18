@@ -77,7 +77,7 @@ func (sigServer *SignalServer) removeMatchSignal(sigName string) error {
 
 func (sigServer *SignalServer) addAllSignals() {
   for name, handlers := range sigServer.sigmap {
-     if err := sigServer.addMatchSignal(name), err != nil {
+     if err := sigServer.addMatchSignal(name); err != nil {
        dPrintln("Add signal %s, got error: %w", name, err)
      }
   }
@@ -85,7 +85,7 @@ func (sigServer *SignalServer) addAllSignals() {
 
 func (sigServer *SignalServer) removeAllSignals() {
   for name, handlers := range sigServer.sigmap {
-     if err := sigServer.removeMatchSignal(name), err != nil {
+     if err := sigServer.removeMatchSignal(name); err != nil {
        dPrintln("Remove signal %s, got error: %w", name, err)
      }
   }
