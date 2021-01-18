@@ -1,11 +1,11 @@
 package dbusutil
 
-import {
+import (
   "context"
   "strings"
   "time"
   "github.com/godbus/dbus"
-}
+)
 
 const {
   dbusInterface = "org.chromium.PowerManager"

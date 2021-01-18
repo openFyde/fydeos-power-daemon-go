@@ -1,6 +1,6 @@
 package suspend_manager
 
-import {
+import (
   "strings"
   "context"
   "os"
@@ -11,7 +11,7 @@ import {
   "github.com/godbus/dbus"
   pmpb "chromiumos/system_api/power_manager_proto"
   "fydeos.com/power_daemon/dbusutil"
-}
+)
 
 // Debug related begin
 const debug = false
