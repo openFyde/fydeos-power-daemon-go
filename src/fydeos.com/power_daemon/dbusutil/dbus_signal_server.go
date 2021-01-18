@@ -42,7 +42,7 @@ func (sigServer *SignalServer) RegisterSignalHandler(sigName string, handler *Si
     handlers = make(SignalHandlers)
     sigmap[sigName] = handlers
   }
-  for _, h: handlers {
+  for _, h := range handlers {
     if h == handler {
       return
     }
@@ -55,7 +55,7 @@ func (sigServer *SignalServer) RevokeSignalHandler(sigName string, handler *Sign
   if !ok {
     return
   }
-  for _, h: handlers {
+  for _, h := range handlers {
     if h == handler {
       h = nil  // we never reduce slice
       return
@@ -76,7 +76,7 @@ func (sigServer *SignalServer) removeMatchSignal(sigName string) error {
 }
 
 func (sigServer *SignalServer) addAllSignals() {
-  for name, handlers : sigServer.sigmap {
+  for name, handlers := range sigServer.sigmap {
      if err := sigServer.addMatchSignal(name), err != nil {
        dPrintln("Add signal %s, got error: %w", name, err)
      }
@@ -84,7 +84,7 @@ func (sigServer *SignalServer) addAllSignals() {
 }
 
 func (sigServer *SignalServer) removeAllSignals() {
-  for name, handlers : sigServer.sigmap {
+  for name, handlers := range sigServer.sigmap {
      if err := sigServer.removeMatchSignal(name), err != nil {
        dPrintln("Remove signal %s, got error: %w", name, err)
      }
@@ -95,7 +95,7 @@ func (sigServer *SignalServer) handleSignal(sig *dbus.Signal) {
   member := sig.Name[len(dbusInterface)+1:]
   dPrintln("Get Signal %s, member: %s", sig.Name, member);
   if handlers, ok := sigServer.sigmap[member]; ok {
-    for _, h : handlers {
+    for _, h := range handlers {
       if h != nil {
         if err = h(sig); err != nil {
           dPrintln("handler signal error:%w", err);
