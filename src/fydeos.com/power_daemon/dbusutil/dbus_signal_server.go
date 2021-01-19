@@ -64,13 +64,13 @@ func (sigServer *SignalServer) RevokeSignalHandler(sigName string, handler *Sign
 }
 
 func (sigServer *SignalServer) addMatchSignal(sigName string) error {
-  return sigServer.conn.AddMatchSignalContext(sigServer.ctx, dbus.WithMatchObjectPath(dbusPath),
+  return sigServer.conn.AddMatchSignal(dbus.WithMatchObjectPath(dbusPath),
     dbus.WithMatchInterface(dbusInterface),dbus.WithMatchSender(dbusSender),
     dbus.WithMatchMember(sigName))
 }
 
 func (sigServer *SignalServer) removeMatchSignal(sigName string) error {
-  return sigServer.conn.RemoveMatchSignalContext(sigServer.ctx, dbus.WithMatchObjectPath(dbusPath),
+  return sigServer.conn.RemoveMatchSignal(dbus.WithMatchObjectPath(dbusPath),
       dbus.WithMatchInterface(dbusInterface),dbus.WithMatchSender(dbusSender),
           dbus.WithMatchMember(sigName))
 }

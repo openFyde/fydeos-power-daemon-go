@@ -13,22 +13,22 @@ func CallProtoMethodWithSequence(ctx context.Context, obj dbus.BusObject, method
   if in != nil {
     marshIn, err := proto.Marshal(in)
     if err != nil {
-      return 0, errors.New(fmt.Println("failed marshaling %s arg", method))
+      return 0, fmt.Errorf("failed marshaling %s arg", method)
     }
     args = append(args, marshIn)
   }
 
   call := obj.CallWithContext(ctx, method, 0, args...)
   if call.Err != nil {
-    return call.ResponseSequence, errors.New(fmt.Println("failed calling %s", method))
+    return call.ResponseSequence, fmt.Errorf("failed calling %s", method)
   }
   if out != nil {
     var marshOut []byte
     if err := call.Store(&marshOut); err != nil {
-      return call.ResponseSequence, errors.Unwrap(fmt.Errorf( "failed reading %s response, err:%w", method, err))
+      return call.ResponseSequence, fmt.Errorf( "failed reading %s response, err:%w", method, err)
     }
     if err := proto.Unmarshal(marshOut, out); err != nil {
-      return call.ResponseSequence, errors.Unwrap(fmt.Errorf("failed unmarshaling %s response, err:%w", method, err))
+      return call.ResponseSequence, fmt.Errorf("failed unmarshaling %s response, err:%w", method, err)
     }
   }
   return call.ResponseSequence, nil
