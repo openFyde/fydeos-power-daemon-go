@@ -20,7 +20,7 @@ func CallProtoMethodWithSequence(ctx context.Context, obj dbus.BusObject, method
 
   call := obj.CallWithContext(ctx, method, 0, args...)
   if call.Err != nil {
-    return call.ResponseSequence, fmt.Errorf("failed calling %s", method)
+    return call.ResponseSequence, fmt.Errorf("failed calling %s, err:%w", method, call.Err)
   }
   if out != nil {
     var marshOut []byte
