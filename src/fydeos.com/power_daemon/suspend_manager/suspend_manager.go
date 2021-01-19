@@ -120,12 +120,13 @@ func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error 
     return err
   }
   manager.delay_id = rsp.GetDelayId();
-  suspend_handler = func(sig *dbus.Signal) error{
+  suspend_handler := func(sig *dbus.Signal) error{
         return manager.handleSuspend(sig)}
   sigServer.RegisterSignalHandler(sigSuspendImminent, &suspend_handler)
-  resume_handler = func(sig *dbus.Signal) error {
+  resume_handler := func(sig *dbus.Signal) error {
         return manager.handleResume(sig)}
   sigServer.RegisterSignalHandler(sigSuspendDone, &resume_handler)
+  return nil
 }
 
 func (manager *SuspendManager) UnRegister(sigServer *dbusutil.SignalServer) error {
