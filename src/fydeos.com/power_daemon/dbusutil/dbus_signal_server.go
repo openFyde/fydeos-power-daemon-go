@@ -30,6 +30,7 @@ func dPrintln(format string, a ...interface{}) {
   if debug {
     fmt.Printf("%s: ",time.Now().Local())
     fmt.Printf(format, a...)
+    fmt.Println("")
   }
 }
 

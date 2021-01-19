@@ -26,6 +26,7 @@ func dPrintln(format string, a ...interface{}) {
   if debug {
     fmt.Printf("%s:(%s) ", time.Now().Local(), trace())
     fmt.Printf(format, a...)
+    fmt.Println("")
   }
 }
 //Debug related end
@@ -41,7 +42,9 @@ func main() {
   defer cancel()
   sigServer := dbusutil.NewSignalServer(ctx, conn)
   suspendManager := suspend_manager.NewSuspendManager(ctx, conn)
-  suspendManager.Register(sigServer)
+  if err := suspendManager.Register(sigServer); err != nil {
+    dPrintln("suspend manager register error:%w", err)
+  }
   defer suspendManager.UnRegister(sigServer)
   sigServer.StartWorking()
 }

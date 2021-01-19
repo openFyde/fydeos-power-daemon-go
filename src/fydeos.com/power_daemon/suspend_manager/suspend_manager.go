@@ -28,6 +28,7 @@ func dPrintln(format string, a ...interface{}) {
   if debug {
     fmt.Printf("%s:(%s) ", time.Now().Local(), trace())
     fmt.Printf(format, a...)
+    fmt.Println("")
   }
 }
 //Debug related end
