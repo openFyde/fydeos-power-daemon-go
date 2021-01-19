@@ -28,7 +28,8 @@ type SignalServer struct {
 
 func dPrintln(a ...interface{}) {
   if debug {
-    fmt.Println(time.Now().Local(), a...)
+    timeStr := time.Now().Local().String()
+    fmt.Println(timeStr, a...)
   }
 }
 
@@ -40,7 +41,7 @@ func (sigServer *SignalServer) RegisterSignalHandler(sigName string, handler *Si
   handlers, ok := sigServer.sigmap[sigName]
   if !ok {
     handlers = make(SignalHandlers,2)
-    sigmap[sigName] = handlers
+    sigServer.sigmap[sigName] = handlers
   }
   for _, h := range handlers {
     if h == handler {
@@ -97,7 +98,7 @@ func (sigServer *SignalServer) handleSignal(sig *dbus.Signal) {
   if handlers, ok := sigServer.sigmap[member]; ok {
     for _, h := range handlers {
       if h != nil {
-        if err := h(sig); err != nil {
+        if err := (*h)(sig); err != nil {
           dPrintln("handler signal error:%w", err);
         }
       }

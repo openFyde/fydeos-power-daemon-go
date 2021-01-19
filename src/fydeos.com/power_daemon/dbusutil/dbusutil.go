@@ -3,7 +3,7 @@ package dbusutil
 import (
   "context"
   "errors"
-
+  "fmt"
   "github.com/godbus/dbus"
   "github.com/golang/protobuf/proto"
 )
@@ -13,14 +13,14 @@ func CallProtoMethodWithSequence(ctx context.Context, obj dbus.BusObject, method
   if in != nil {
     marshIn, err := proto.Marshal(in)
     if err != nil {
-      return 0, errors.Wrapf(err, "failed marshaling %s arg", method)
+      return 0, errors.New("failed marshaling %s arg", method)
     }
     args = append(args, marshIn)
   }
 
   call := obj.CallWithContext(ctx, method, 0, args...)
   if call.Err != nil {
-    return call.ResponseSequence, errors.Wrapf(call.Err, "failed calling %s", method)
+    return call.ResponseSequence, errors.New("failed calling %s", method)
   }
   if out != nil {
     var marshOut []byte
@@ -51,7 +51,7 @@ func DecodeSignal(sig *dbus.Signal, sigResult proto.Message) error {
     return errors.New("signal body is not a byte slice")
   }
   if err := proto.Unmarshal(buf, sigResult); err != nil {
-    return errors.Wrap(err, "failed unmarshaling signal body")
+    return errors.New("failed unmarshaling signal body")
   }
   return nil
 }
