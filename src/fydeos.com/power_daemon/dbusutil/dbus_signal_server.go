@@ -18,12 +18,12 @@ type SignalHandler func(*dbus.Signal) error
 
 type SignalHandlers []SignalHandler
 
-type SignalMap map[string]SignalHandlers
+type SignalMap map[string]*SignalHandlers
 
 type SignalServer struct {
   ctx context.Context
   conn *dbus.Conn
-  sigmap *SignalMap
+  sigmap SignalMap
 }
 
 func dPrintln(format string, a ...interface{}) {
@@ -35,16 +35,17 @@ func dPrintln(format string, a ...interface{}) {
 }
 
 func NewSignalServer(ctx context.Context, conn *dbus.Conn) *SignalServer {
-  return &SignalServer{ctx, conn, &make(SignalMap)}
+  return &SignalServer{ctx, conn, make(SignalMap)}
 }
 
 func (sigServer *SignalServer) RegisterSignalHandler(sigName string, handler SignalHandler) {
   handlers, ok := sigServer.sigmap[sigName]
   if !ok {
-    sigServer.sigmap[sigName] = &make(SignalHandlers,0, 5)
+    buff := make(SignalHandlers,0, 5)
+    sigServer.sigmap[sigName] = &buff
     handlers = sigServer.sigmap[sigName]
   }
-  handlers = append(handlers, handler)
+  *handlers = append(*handlers, handler)
 }
 /*
 func (sigServer *SignalServer) RevokeSignalHandler(sigName string, handler SignalHandler) {
@@ -98,7 +99,7 @@ func (sigServer *SignalServer) handleSignal(sig *dbus.Signal) {
   member := sig.Name[len(dbusInterface)+1:]
   dPrintln("Get Signal %s, member: %s", sig.Name, member);
   if handlers, ok := sigServer.sigmap[member]; ok {
-    for _, h := range handlers {
+    for _, h := range *handlers {
       if h != nil {
         if err := h(sig); err != nil {
           dPrintln("handler signal error:%w", err);
