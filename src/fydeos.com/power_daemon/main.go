@@ -32,7 +32,7 @@ func dPrintln(format string, a ...interface{}) {
 //Debug related end
 
 func main() {
-  conn, err := dbus.ConnectSystemBus()
+  conn, err := dbus.ConnectSystemBus(dbus.WithSignalHandler(dbus.NewSequentialSignalHandler()))
   if err != nil {
     dPrintln("Connect system bus error:%w", err)
     os.Exit(1)

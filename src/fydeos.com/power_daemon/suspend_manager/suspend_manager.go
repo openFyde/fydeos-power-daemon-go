@@ -35,6 +35,8 @@ func dPrintln(format string, a ...interface{}) {
 
 const (
   dbusInterface = "org.chromium.PowerManager"
+  dbusName = "org.chromium.PowerManager"
+  dbusPath = "/org/chromium/PowerManager"
   sigSuspendImminent = "SuspendImminent"
   sigSuspendDone = "SuspendDone"
   methdRegisterSuspendDelay = ".RegisterSuspendDelay"
@@ -48,19 +50,19 @@ const (
 
 type SuspendManager struct {
   ctx context.Context
-  conn *dbus.Conn
+  obj dbus.BusObject
   delay_id int32
   suspend_id int32
   on_suspend_delay bool
 }
 
 func NewSuspendManager(ctx context.Context, conn *dbus.Conn) *SuspendManager {
-  return &SuspendManager{ctx, conn, 0, 0, false}
+  return &SuspendManager{ctx, conn.Object(dbusName, dbusPath), 0, 0, false}
 }
 
 func (manager *SuspendManager) sendSuspendReadiness() error{
   req := &pmpb.SuspendReadinessInfo{ DelayId: &manager.delay_id, SuspendId: &manager.suspend_id}
-  return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdHandleSuspendReadiness, req, nil)
+  return dbusutil.CallProtoMethod(manager.ctx, manager.obj, dbusInterface + methdHandleSuspendReadiness, req, nil)
 }
 
 func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
@@ -119,7 +121,7 @@ func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error 
   descript:= serverDescription
   req := &pmpb.RegisterSuspendDelayRequest{Timeout: &timeout, Description: &descript}
   rsp := &pmpb.RegisterSuspendDelayReply{}
-  err := dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdRegisterSuspendDelay, req, rsp)
+  err := dbusutil.CallProtoMethod(manager.ctx, manager.obj, dbusInterface + methdRegisterSuspendDelay, req, rsp)
   if err != nil {
     return err
   }
@@ -138,7 +140,7 @@ func (manager *SuspendManager) UnRegister(sigServer *dbusutil.SignalServer) erro
   if manager.delay_id != 0 {
     req := &pmpb.UnregisterSuspendDelayRequest{DelayId: &manager.delay_id}
     dPrintln("Unregister suspend manager")
-    return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdUnregisterSuspendDelay, req, nil)
+    return dbusutil.CallProtoMethod(manager.ctx, manager.obj, dbusInterface + methdUnregisterSuspendDelay, req, nil)
   }
   return nil
 }
