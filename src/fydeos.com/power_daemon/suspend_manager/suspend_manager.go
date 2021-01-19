@@ -1,13 +1,13 @@
 package suspend_manager
 
 import (
-  "strings"
   "context"
   "os"
   "os/exec"
   "time"
   "runtime"
   "fmt"
+  "errors"
   "github.com/godbus/dbus"
   pmpb "chromiumos/system_api/power_manager_proto"
   "fydeos.com/power_daemon/dbusutil"
@@ -46,14 +46,14 @@ const (
 )
 
 type SuspendManager struct {
-  ctx *context.Context
+  ctx context.Context
   conn *dbus.Conn
-  delay_id int
-  suspend_id int
+  delay_id int32
+  suspend_id int32
   on_suspend_delay bool
 }
 
-func NewSuspendManager(ctx context.Context, conn *dbus.Conn) (*SuspendManager, error) {
+func NewSuspendManager(ctx context.Context, conn *dbus.Conn) *SuspendManager {
   return &SuspendManager{ctx, conn, 0, 0, false}
 }
 
@@ -110,7 +110,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
   return nil
 }
 
-func (manager *SuspendManager) Register(sigServer *SignalServer) error {
+func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error {
   req := &pmpb.RegisterSuspendDelayRequest{execTimeout, serverDescription}
   rsp := &pmpb.RegisterSuspendDelayReply{}
   err := dbusutil.CallProtoMethod(ctx, manager.conn.BusObject(), dbusInterface + methdRegisterSuspendDelay, req, rsp)
@@ -126,7 +126,7 @@ func (manager *SuspendManager) Register(sigServer *SignalServer) error {
   })
 }
 
-func (manager *SuspendManager) UnRegister(sigServer *SignalServer) error {
+func (manager *SuspendManager) UnRegister(sigServer *dbusutil.SignalServer) error {
   if manager.delay_id {
     req := &pmpb.UnregisterSuspendDelayRequest{manager.delay_id}
     return dbusutil.CallProtoMethod(ctx, manager.conn.BusObject(), dbusInterface + methdUnregisterSuspendDelay. req, nil)
