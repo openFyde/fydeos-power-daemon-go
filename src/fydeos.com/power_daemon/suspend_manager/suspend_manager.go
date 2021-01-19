@@ -58,8 +58,8 @@ func NewSuspendManager(ctx context.Context, conn *dbus.Conn) *SuspendManager {
 }
 
 func (manager *SuspendManager) sendSuspendReadiness() error{
-  req := &pmpb.SuspendReadinessInfo{manager.delay_id, manager.suspend_id}
-  return dbusutil.CallProtoMethod(ctx, manager.conn.BusObject(), dbusInterface + methdHandleSuspendReadiness, req, nil)
+  req := &pmpb.SuspendReadinessInfo{&manager.delay_id, &manager.suspend_id}
+  return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdHandleSuspendReadiness, req, nil)
 }
 
 func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
@@ -70,9 +70,9 @@ func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
   if err := dbusutil.DecodeSignal(signal, suspendInfo); err != nil {
     return err
   }
-  manager.suspend_id = suspendInfo.suspend_id
+  manager.suspend_id = suspendInfo.SuspendId
   manager.on_suspend_delay = true
-  dPrintln("On suspend: %d, for reason %d", manager.suspend_id, suspendInfo.reason)
+  dPrintln("On suspend: %d, for reason %d", manager.suspend_id, suspendInfo.Reason)
   if fi, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
@@ -93,7 +93,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
   if err := dbusutil.DecodeSignal(signal, suspendInfo); err != nil {
     return err
   }
-  if suspendInfo.suspend_id != manager.suspend_id {
+  if suspendInfo.SuspendId != manager.suspend_id {
     dPrintln("The resume suspend id is different from original")
   }
   manager.suspend_id = 0
@@ -111,7 +111,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
 }
 
 func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error {
-  req := &pmpb.RegisterSuspendDelayRequest{execTimeout, serverDescription}
+  req := &pmpb.RegisterSuspendDelayRequest{&execTimeout, &serverDescription}
   rsp := &pmpb.RegisterSuspendDelayReply{}
   err := dbusutil.CallProtoMethod(ctx, manager.conn.BusObject(), dbusInterface + methdRegisterSuspendDelay, req, rsp)
   if err != nil {
