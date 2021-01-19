@@ -24,10 +24,10 @@ func trace() string{
     return fn.Name()
 }
 
-func dPrintln(a ...interface{}) {
+func dPrintln(format string, a ...interface{}) {
   if debug {
     fmt.Printf("%s:(%s) ", time.Now().Local(), trace())
-    fmt.Println(a...)
+    fmt.Printf(format, a...)
   }
 }
 //Debug related end

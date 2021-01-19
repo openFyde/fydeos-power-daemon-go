@@ -26,10 +26,10 @@ type SignalServer struct {
   sigmap SignalMap
 }
 
-func dPrintln(a ...interface{}) {
+func dPrintln(format string, a ...interface{}) {
   if debug {
     fmt.Printf("%s: ",time.Now().Local())
-    fmt.Println(a...)
+    fmt.Printf(format, a...)
   }
 }
 
@@ -65,7 +65,7 @@ func (sigServer *SignalServer) RevokeSignalHandler(sigName string, handler *Sign
 }
 
 func (sigServer *SignalServer) addMatchSignal(sigName string) error {
-  dPrintln("Add signal filter path:%s, interface:%s, sender:%s, signal:%s",
+  dPrintln("Add signal filter path:%s, interface:%s, signal:%s",
     dbusPath, dbusInterface, sigName)
   return sigServer.conn.AddMatchSignal(dbus.WithMatchObjectPath(dbusPath),
     dbus.WithMatchInterface(dbusInterface),
@@ -73,7 +73,7 @@ func (sigServer *SignalServer) addMatchSignal(sigName string) error {
 }
 
 func (sigServer *SignalServer) removeMatchSignal(sigName string) error {
-  dPrintln("Remove signal filter path:%s, interface:%s, sender:%s, signal:%s",
+  dPrintln("Remove signal filter path:%s, interface:%s, signal:%s",
     dbusPath, dbusInterface, sigName)
   return sigServer.conn.RemoveMatchSignal(dbus.WithMatchObjectPath(dbusPath),
       dbus.WithMatchInterface(dbusInterface),
