@@ -3,7 +3,6 @@ package main
 import (
   "fmt"
   "os"
-  "os/exec"
   "context"
   "runtime"
   "time"
@@ -43,6 +42,6 @@ func main() {
   sigServer := dbusutil.NewSignalServer(ctx, conn)
   suspendManager := suspend_manager.NewSuspendManager(ctx, conn)
   suspendManager.Register(sigServer)
-  defer suspendManager.UnRegister()
+  defer suspendManager.UnRegister(sigServer)
   sigServer.StartWorking()
 }
