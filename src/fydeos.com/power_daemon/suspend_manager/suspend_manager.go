@@ -111,6 +111,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
 }
 
 func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error {
+  var suspend_handler,resume_handler dbusutil.SignalHandler
   timeout := int64(execTimeout)
   descript:= serverDescription
   req := &pmpb.RegisterSuspendDelayRequest{Timeout: &timeout, Description: &descript}
@@ -120,10 +121,10 @@ func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error 
     return err
   }
   manager.delay_id = rsp.GetDelayId();
-  suspend_handler := func(sig *dbus.Signal) error{
+  suspend_handler = func(sig *dbus.Signal) error{
         return manager.handleSuspend(sig)}
   sigServer.RegisterSignalHandler(sigSuspendImminent, &suspend_handler)
-  resume_handler := func(sig *dbus.Signal) error {
+  resume_handler = func(sig *dbus.Signal) error {
         return manager.handleResume(sig)}
   sigServer.RegisterSignalHandler(sigSuspendDone, &resume_handler)
   return nil
