@@ -98,7 +98,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
   }
   manager.suspend_id = 0
   manager.on_suspend_delay = false
-  dPrintln("On suspend: %d, duration: %d, type:%s", manager.suspend_id, suspendInfo.GetSuspendDuration(), suspendInfo.SuspendDone_WakeupType().String())
+  dPrintln("On suspend: %d, duration: %d, type:%s", manager.suspend_id, suspendInfo.GetSuspendDuration(), suspendInfo.GetWakeupType().String())
   if fi, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
@@ -120,12 +120,12 @@ func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error 
     return err
   }
   manager.delay_id = rsp.GetDelayId();
-  sigServer.RegisterSignalHandler(sigSuspendImminent, &func(sig *dbus.Signal){
-    return manager.handleSuspend(sig)
-  })
-  sigServer.RegisterSignalHandler(sigSuspendDone, &func(sig *dbus.Signal){
-    return manager.handleResume(sig)
-  })
+  suspend_handler = func(sig *dbus.Signal) error{
+        return manager.handleSuspend(sig)}
+  sigServer.RegisterSignalHandler(sigSuspendImminent, &suspend_handler)
+  resume_handler = func(sig *dbus.Signal) error {
+        return manager.handleResume(sig)}
+  sigServer.RegisterSignalHandler(sigSuspendDone, &resume_handler)
 }
 
 func (manager *SuspendManager) UnRegister(sigServer *dbusutil.SignalServer) error {
