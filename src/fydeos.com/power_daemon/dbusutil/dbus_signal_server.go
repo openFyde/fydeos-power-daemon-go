@@ -2,8 +2,8 @@ package dbusutil
 
 import (
   "context"
-  "strings"
   "time"
+  "fmt"
   "github.com/godbus/dbus"
 )
 
@@ -21,7 +21,7 @@ type SignalHandlers []*SignalHandler
 type SignalMap map[string]SignalHandlers
 
 type SignalServer struct {
-  ctx *context.Context
+  ctx context.Context
   conn *dbus.Conn
   sigmap SignalMap
 }
@@ -39,7 +39,7 @@ func NewSignalServer(ctx context.Context, conn *dbus.Conn) *SignalServer {
 func (sigServer *SignalServer) RegisterSignalHandler(sigName string, handler *SignalHandler) {
   handlers, ok := sigServer.sigmap[sigName]
   if !ok {
-    handlers = make(SignalHandlers)
+    handlers = make(SignalHandlers,2)
     sigmap[sigName] = handlers
   }
   for _, h := range handlers {
@@ -97,7 +97,7 @@ func (sigServer *SignalServer) handleSignal(sig *dbus.Signal) {
   if handlers, ok := sigServer.sigmap[member]; ok {
     for _, h := range handlers {
       if h != nil {
-        if err = h(sig); err != nil {
+        if err := h(sig); err != nil {
           dPrintln("handler signal error:%w", err);
         }
       }
