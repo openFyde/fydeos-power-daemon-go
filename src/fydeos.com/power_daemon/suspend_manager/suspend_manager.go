@@ -73,7 +73,7 @@ func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
   manager.suspend_id = suspendInfo.suspend_id
   manager.on_suspend_delay = true
   dPrintln("On suspend: %d, for reason %d", manager.suspend_id, suspendInfo.reason)
-  if fi, err : = os.Stat(pathPreSuspendScript); err != nil {
+  if fi, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
   ctx, cancel := context.WithTimeout(context.Background(), execTimeout * time.Millisecond)
@@ -99,7 +99,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
   manager.suspend_id = 0
   manager.on_suspend_delay = false
   dPrintln("On suspend: %d", manager.suspend_id)
-  if fi, err : = os.Stat(pathPreSuspendScript); err != nil {
+  if fi, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
   ctx, cancel := context.WithTimeout(context.Background(), execTimeout * time.Millisecond * 10)
