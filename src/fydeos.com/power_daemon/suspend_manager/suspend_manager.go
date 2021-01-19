@@ -107,7 +107,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
   if _, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
-  ctx, cancel := context.WithTimeout(context.Background(), execTimeout * time.Millisecond * 10)
+  ctx, cancel := context.WithTimeout(context.Background(), execTimeout * time.Millisecond * 1000)
   defer cancel()
   if err := exec.CommandContext(ctx, pathPostResumeScript).Run(); err != nil {
     dPrintln("Exec post-resume script error:%w", err)
