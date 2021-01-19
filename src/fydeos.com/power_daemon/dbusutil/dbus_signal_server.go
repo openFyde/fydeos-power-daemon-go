@@ -44,14 +44,16 @@ func (sigServer *SignalServer) RegisterSignalHandler(sigName string, handler Sig
     handlers = make(SignalHandlers,2)
     sigServer.sigmap[sigName] = handlers
   }
+  /*
   for _, h := range handlers {
     if h == handler {
       return
     }
   }
+  */
   handlers = append(handlers, handler)
 }
-
+/*
 func (sigServer *SignalServer) RevokeSignalHandler(sigName string, handler SignalHandler) {
   handlers, ok := sigServer.sigmap[sigName]
   if !ok {
@@ -64,7 +66,7 @@ func (sigServer *SignalServer) RevokeSignalHandler(sigName string, handler Signa
     }
   }
 }
-
+*/
 func (sigServer *SignalServer) addMatchSignal(sigName string) error {
   dPrintln("Add signal filter path:%s, interface:%s, signal:%s",
     dbusPath, dbusInterface, sigName)
