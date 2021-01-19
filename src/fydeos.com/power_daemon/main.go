@@ -31,7 +31,7 @@ func dPrintln(a ...interface{}) {
 }
 //Debug related end
 
-main() {
+func main() {
   conn, err := dbus.ConnectSystemBus()
   if err != nil {
     dPrintln("Connect system bus error:%w", err)
