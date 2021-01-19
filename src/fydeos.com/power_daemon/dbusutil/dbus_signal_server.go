@@ -23,7 +23,7 @@ type SignalMap map[string]SignalHandlers
 type SignalServer struct {
   ctx context.Context
   conn *dbus.Conn
-  sigmap SignalMap
+  sigmap *SignalMap
 }
 
 func dPrintln(format string, a ...interface{}) {
@@ -35,22 +35,15 @@ func dPrintln(format string, a ...interface{}) {
 }
 
 func NewSignalServer(ctx context.Context, conn *dbus.Conn) *SignalServer {
-  return &SignalServer{ctx, conn, make(SignalMap)}
+  return &SignalServer{ctx, conn, &make(SignalMap)}
 }
 
 func (sigServer *SignalServer) RegisterSignalHandler(sigName string, handler SignalHandler) {
   handlers, ok := sigServer.sigmap[sigName]
   if !ok {
-    handlers = make(SignalHandlers,2)
-    sigServer.sigmap[sigName] = handlers
+    sigServer.sigmap[sigName] = &make(SignalHandlers,0, 5)
+    handlers = sigServer.sigmap[sigName]
   }
-  /*
-  for _, h := range handlers {
-    if h == handler {
-      return
-    }
-  }
-  */
   handlers = append(handlers, handler)
 }
 /*
@@ -98,6 +91,7 @@ func (sigServer *SignalServer) removeAllSignals() {
        dPrintln("Remove signal %s, got error: %w", name, err)
      }
   }
+  sigServer.sigmap = nil
 }
 
 func (sigServer *SignalServer) handleSignal(sig *dbus.Signal) {
