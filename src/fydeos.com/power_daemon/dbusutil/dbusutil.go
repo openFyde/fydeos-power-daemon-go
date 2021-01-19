@@ -13,14 +13,14 @@ func CallProtoMethodWithSequence(ctx context.Context, obj dbus.BusObject, method
   if in != nil {
     marshIn, err := proto.Marshal(in)
     if err != nil {
-      return 0, errors.New("failed marshaling %s arg", method)
+      return 0, errors.New(fmt.Println("failed marshaling %s arg", method))
     }
     args = append(args, marshIn)
   }
 
   call := obj.CallWithContext(ctx, method, 0, args...)
   if call.Err != nil {
-    return call.ResponseSequence, errors.New("failed calling %s", method)
+    return call.ResponseSequence, errors.New(fmt.Println("failed calling %s", method))
   }
   if out != nil {
     var marshOut []byte

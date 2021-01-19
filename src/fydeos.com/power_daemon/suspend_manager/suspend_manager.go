@@ -26,7 +26,7 @@ func trace() string{
 
 func dPrintln(a ...interface{}) {
   if debug {
-    fmt.Println(time.Now().Local(), trace(), a...)
+    fmt.Println(time.Now().Local().String(), trace(), a...)
   }
 }
 //Debug related end
