@@ -28,7 +28,7 @@ type SignalServer struct {
 
 func dPrintln(a ...interface{}) {
   if debug {
-    fmt.Println(time.Now().Local().String(), a...)
+    fmt.Println(time.Now().Local().String(), ...a)
   }
 }
 
