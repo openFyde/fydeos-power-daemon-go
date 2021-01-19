@@ -58,7 +58,7 @@ func NewSuspendManager(ctx context.Context, conn *dbus.Conn) *SuspendManager {
 }
 
 func (manager *SuspendManager) sendSuspendReadiness() error{
-  req := &pmpb.SuspendReadinessInfo{&manager.delay_id, &manager.suspend_id}
+  req := &pmpb.SuspendReadinessInfo{ DelayId: &manager.delay_id, SuspendId: &manager.suspend_id}
   return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdHandleSuspendReadiness, req, nil)
 }
 
@@ -70,9 +70,9 @@ func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
   if err := dbusutil.DecodeSignal(signal, suspendInfo); err != nil {
     return err
   }
-  manager.suspend_id = *suspendInfo.SuspendId
+  manager.suspend_id = suspendInfo.GetSuspendId()
   manager.on_suspend_delay = true
-  dPrintln("On suspend: %d, for reason %d", manager.suspend_id, *suspendInfo.Reason)
+  dPrintln("On suspend: %d, for reason %s", manager.suspend_id, suspendInfo.GetReason().String())
   if fi, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
@@ -93,12 +93,12 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
   if err := dbusutil.DecodeSignal(signal, suspendInfo); err != nil {
     return err
   }
-  if *suspendInfo.SuspendId != manager.suspend_id {
+  if suspendInfo.GetSuspendId() != manager.suspend_id {
     dPrintln("The resume suspend id is different from original")
   }
   manager.suspend_id = 0
   manager.on_suspend_delay = false
-  dPrintln("On suspend: %d", manager.suspend_id)
+  dPrintln("On suspend: %d, duration: %d, type:%s", manager.suspend_id, suspendInfo.GetSuspendDuration(), suspendInfo.SuspendDone_WakeupType().String())
   if fi, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
@@ -111,7 +111,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
 }
 
 func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error {
-  timeout := execTimeout.(int64)
+  timeout := int64(execTimeout)
   descript:= serverDescription
   req := &pmpb.RegisterSuspendDelayRequest{Timeout: &timeout, Description: &descript}
   rsp := &pmpb.RegisterSuspendDelayReply{}
@@ -119,19 +119,19 @@ func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error 
   if err != nil {
     return err
   }
-  manager.delay_id = *rsp.DelayId;
-  sigServer.RegisterSignalHandler(sigSuspendImminent, func(sig *dbus.Signal){
+  manager.delay_id = rsp.GetDelayId();
+  sigServer.RegisterSignalHandler(sigSuspendImminent, &func(sig *dbus.Signal){
     return manager.handleSuspend(sig)
   })
-  sigServer.RegisterSignalHandler(sigSuspendDone, func(sig *dbus.Signal){
+  sigServer.RegisterSignalHandler(sigSuspendDone, &func(sig *dbus.Signal){
     return manager.handleResume(sig)
   })
 }
 
 func (manager *SuspendManager) UnRegister(sigServer *dbusutil.SignalServer) error {
-  if manager.delay_id {
+  if manager.delay_id != 0 {
     req := &pmpb.UnregisterSuspendDelayRequest{DelayId: &manager.delay_id}
-    return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdUnregisterSuspendDelay. req, nil)
+    return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdUnregisterSuspendDelay, req, nil)
   }
   return nil
 }
