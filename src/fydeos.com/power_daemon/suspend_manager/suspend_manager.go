@@ -14,7 +14,7 @@ import (
 )
 
 // Debug related begin
-const debug = false
+const debug = true
 
 func trace() string{
     pc, _, _, ok := runtime.Caller(2)
@@ -63,6 +63,7 @@ func (manager *SuspendManager) sendSuspendReadiness() error{
 }
 
 func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
+  dPrintln("Get Suspend signal")
   if manager.on_suspend_delay {
     return errors.New("System is on suspend already")
   }
@@ -86,6 +87,7 @@ func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
 }
 
 func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
+  dPrintln("Get Resume signal")
   if !manager.on_suspend_delay {
     return errors.New("System is not on suspend")
   }
@@ -127,12 +129,14 @@ func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error 
   resume_handler = func(sig *dbus.Signal) error {
         return manager.handleResume(sig)}
   sigServer.RegisterSignalHandler(sigSuspendDone, &resume_handler)
+  dPrintln("Register suspend manager")
   return nil
 }
 
 func (manager *SuspendManager) UnRegister(sigServer *dbusutil.SignalServer) error {
   if manager.delay_id != 0 {
     req := &pmpb.UnregisterSuspendDelayRequest{DelayId: &manager.delay_id}
+    dPrintln("Unregister suspend manager")
     return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdUnregisterSuspendDelay, req, nil)
   }
   return nil

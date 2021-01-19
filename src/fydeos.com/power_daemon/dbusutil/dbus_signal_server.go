@@ -65,14 +65,18 @@ func (sigServer *SignalServer) RevokeSignalHandler(sigName string, handler *Sign
 }
 
 func (sigServer *SignalServer) addMatchSignal(sigName string) error {
+  dPrintln("Add signal filter path:%s, interface:%s, sender:%s, signal:%s",
+    dbusPath, dbusInterface, sigName)
   return sigServer.conn.AddMatchSignal(dbus.WithMatchObjectPath(dbusPath),
-    dbus.WithMatchInterface(dbusInterface),dbus.WithMatchSender(dbusSender),
+    dbus.WithMatchInterface(dbusInterface),
     dbus.WithMatchMember(sigName))
 }
 
 func (sigServer *SignalServer) removeMatchSignal(sigName string) error {
+  dPrintln("Remove signal filter path:%s, interface:%s, sender:%s, signal:%s",
+    dbusPath, dbusInterface, sigName)
   return sigServer.conn.RemoveMatchSignal(dbus.WithMatchObjectPath(dbusPath),
-      dbus.WithMatchInterface(dbusInterface),dbus.WithMatchSender(dbusSender),
+      dbus.WithMatchInterface(dbusInterface),
           dbus.WithMatchMember(sigName))
 }
 
@@ -82,6 +86,7 @@ func (sigServer *SignalServer) addAllSignals() {
        dPrintln("Add signal %s, got error: %w", name, err)
      }
   }
+  dPrintln("Finnished add signal filters.")
 }
 
 func (sigServer *SignalServer) removeAllSignals() {
@@ -113,6 +118,7 @@ func (sigServer *SignalServer) StartWorking() {
   defer close(ch)
   sigServer.conn.Signal(ch)
   defer sigServer.conn.RemoveSignal(ch)
+  dPrintln("Start listening signal...");
   for {
     select {
       case sig := <-ch:
