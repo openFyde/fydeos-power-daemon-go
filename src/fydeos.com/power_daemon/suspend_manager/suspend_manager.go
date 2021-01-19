@@ -70,9 +70,9 @@ func (manager *SuspendManager) handleSuspend(signal *dbus.Signal) error {
   if err := dbusutil.DecodeSignal(signal, suspendInfo); err != nil {
     return err
   }
-  manager.suspend_id = suspendInfo.SuspendId
+  manager.suspend_id = *suspendInfo.SuspendId
   manager.on_suspend_delay = true
-  dPrintln("On suspend: %d, for reason %d", manager.suspend_id, suspendInfo.Reason)
+  dPrintln("On suspend: %d, for reason %d", manager.suspend_id, *suspendInfo.Reason)
   if fi, err := os.Stat(pathPreSuspendScript); err != nil {
     dPrintln("The script:%s is not exist.", pathPreSuspendScript)
   }
@@ -93,7 +93,7 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
   if err := dbusutil.DecodeSignal(signal, suspendInfo); err != nil {
     return err
   }
-  if suspendInfo.SuspendId != manager.suspend_id {
+  if *suspendInfo.SuspendId != manager.suspend_id {
     dPrintln("The resume suspend id is different from original")
   }
   manager.suspend_id = 0
@@ -111,13 +111,15 @@ func (manager *SuspendManager) handleResume(signal *dbus.Signal) error {
 }
 
 func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error {
-  req := &pmpb.RegisterSuspendDelayRequest{&execTimeout, &serverDescription}
+  timeout := execTimeout.(int64)
+  descript:= serverDescription
+  req := &pmpb.RegisterSuspendDelayRequest{Timeout: &timeout, Description: &descript}
   rsp := &pmpb.RegisterSuspendDelayReply{}
-  err := dbusutil.CallProtoMethod(ctx, manager.conn.BusObject(), dbusInterface + methdRegisterSuspendDelay, req, rsp)
+  err := dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdRegisterSuspendDelay, req, rsp)
   if err != nil {
     return err
   }
-  manager.delay_id = rsp.delay_id;
+  manager.delay_id = *rsp.DelayId;
   sigServer.RegisterSignalHandler(sigSuspendImminent, func(sig *dbus.Signal){
     return manager.handleSuspend(sig)
   })
@@ -128,8 +130,8 @@ func (manager *SuspendManager) Register(sigServer *dbusutil.SignalServer) error 
 
 func (manager *SuspendManager) UnRegister(sigServer *dbusutil.SignalServer) error {
   if manager.delay_id {
-    req := &pmpb.UnregisterSuspendDelayRequest{manager.delay_id}
-    return dbusutil.CallProtoMethod(ctx, manager.conn.BusObject(), dbusInterface + methdUnregisterSuspendDelay. req, nil)
+    req := &pmpb.UnregisterSuspendDelayRequest{DelayId: &manager.delay_id}
+    return dbusutil.CallProtoMethod(manager.ctx, manager.conn.BusObject(), dbusInterface + methdUnregisterSuspendDelay. req, nil)
   }
   return nil
 }
