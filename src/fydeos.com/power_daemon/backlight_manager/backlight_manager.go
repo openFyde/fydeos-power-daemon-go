@@ -54,7 +54,7 @@ func getHWConfig(name string) (string, error) {
 }
 
 func saveHWConfig(name string, value string) error {
-  fi, err := os.Lstat(pathConfig)
+  _, err := os.Lstat(pathConfig)
   if err != nil {
     err = os.Mkdir(pathConfig, os.ModeDir)
     if err != nil {
