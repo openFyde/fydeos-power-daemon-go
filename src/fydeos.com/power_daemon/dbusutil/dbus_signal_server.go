@@ -4,6 +4,7 @@ import (
   "context"
   "log"
   "github.com/godbus/dbus"
+  "os"
   "os/signal"
   "syscall"
 )
