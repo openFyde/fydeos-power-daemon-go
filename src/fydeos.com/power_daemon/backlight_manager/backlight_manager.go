@@ -40,9 +40,6 @@ func getHWConfig(name string) (string, error) {
   if err != nil || !fi.IsDir() {
     return "",fmt.Errorf("%s or %s is not exist", pathConfig, name)
   }
-  if !fi.IsDir() {
-    log.Fatalf("%s is supposed to be a dirctory, but not", pathConfig)
-  }
   buf, err := ioutil.ReadFile(pathConfig + "/" + name)
   if err != nil {
     return "", err
@@ -55,7 +52,7 @@ func saveHWConfig(name string, value string) error {
   log.Printf("save config %s:%s", name, value)
   _, err := os.Lstat(pathConfig)
   if err != nil {
-    err = os.Mkdir(pathConfig, os.ModeDir)
+    err = os.Mkdir(pathConfig, 0700)
     if err != nil {
       return err
     }
