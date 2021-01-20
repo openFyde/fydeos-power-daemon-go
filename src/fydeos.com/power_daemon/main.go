@@ -8,6 +8,7 @@ import (
   "github.com/godbus/dbus"
   "fydeos.com/power_daemon/dbusutil"
   "fydeos.com/power_daemon/suspend_manager"
+  "fydeos.com/power_daemon/backlight_manager"
 )
 
 
@@ -29,5 +30,10 @@ func main() {
     log.Fatalf("suspend manager register error:%w", err)
   }
   defer suspendManager.UnRegister(sigServer)
+  backlightManager := backlight_manager.NewScreenBrightnessManager(ctx, conn)
+  if err := backlightManager.Register(sigServer); err != nil {
+    log.Fatalf("backlight manager register error:%w", err)
+  }
+  defer backlightManager.UnRegister(sigServer)
   sigServer.StartWorking()
 }
