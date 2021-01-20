@@ -4,6 +4,8 @@ import (
   "context"
   "log"
   "github.com/godbus/dbus"
+  "os/signal"
+  "syscall"
 )
 
 type SignalHandler func(*dbus.Signal) error
@@ -88,11 +90,15 @@ func (sigServer *SignalServer) StartWorking() {
   sigServer.conn.Signal(ch)
   defer sigServer.conn.RemoveSignal(ch)
   log.Println("Start listening signal...");
+  sysch := make(chan os.Signal, 1)
+  signal.Notify(sysch, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGSTOP,syscall.SIGKILL)
   for {
     select {
       case sig := <-ch:
         sigServer.handleSignal(sig)
       case <-sigServer.ctx.Done():
+        return
+      case <-sysch:
         return
     }
   }
