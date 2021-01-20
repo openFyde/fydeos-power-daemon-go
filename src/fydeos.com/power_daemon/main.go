@@ -1,10 +1,7 @@
 package main
 
 import (
-  "fmt"
-  "os"
   "context"
-  "runtime"
   "time"
   "log"
   "github.com/godbus/dbus"
