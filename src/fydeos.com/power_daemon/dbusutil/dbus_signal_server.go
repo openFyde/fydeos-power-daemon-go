@@ -92,7 +92,8 @@ func (sigServer *SignalServer) StartWorking() {
   defer sigServer.conn.RemoveSignal(ch)
   log.Println("Start listening signal...");
   sysch := make(chan os.Signal, 1)
-  signal.Notify(sysch, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGSTOP,syscall.SIGKILL)
+  signal.Notify(sysch, syscall.SIGINT, syscall.SIGQUIT,
+    syscall.SIGKILL, syscall.SIGTERM, syscall.SIGABRT)
   for {
     select {
       case sig := <-ch:
