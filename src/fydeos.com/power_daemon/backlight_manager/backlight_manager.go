@@ -45,7 +45,10 @@ func getHWConfig(name string) (string, error) {
   if !fi.IsDir() {
     log.Fatalf("%s is supposed to be a dirctory, but not", pathConfig)
   }
-  return ioutil.ReadFile(pathConfig + "/" + name)
+  if buf, o_err := ioutil.ReadFile(pathConfig + "/" + name); o_err != nil {
+    return "", o_err
+  }
+  return string(buf), nil
 }
 
 func saveHWConfig(name string, value string) error {
@@ -56,17 +59,17 @@ func saveHWConfig(name string, value string) error {
       return err
     }
   }
-  return ioutil.WriteFile(pathConfig + "/" + name, value, 0644)
+  return ioutil.WriteFile(pathConfig + "/" + name, []byte(value), 0644)
 }
 
 func NewScreenBrightnessManager(ctx context.Context, conn *dbus.Conn) (bm *ScreenBrightnessManager) {
   bm = &ScreenBrightnessManager{ctx, dbusutil.GetPMObject(conn),
       defaultBrightness, false, 0, false}
-  if value, err := GetHWConfig(fileBrightness); err == nil {
+  if value, err := getHWConfig(fileBrightness); err == nil {
     log.Printf("read hardware config; screen brightness:%s", value)
     bm.screen_brightness, _ = strconv.ParseFloat(value, 64)
   }
-  if value, err := GetHWConfig(fileKeyboardBrightness); err == nil {
+  if value, err := getHWConfig(fileKeyboardBrightness); err == nil {
     log.Printf("read hardware config; keyboard brightness:%s", value)
     bm.keyboard_brightness, _ = strconv.ParseFloat(value, 64)
   }
@@ -75,7 +78,7 @@ func NewScreenBrightnessManager(ctx context.Context, conn *dbus.Conn) (bm *Scree
 
 func (bm *ScreenBrightnessManager) HandleSetScreenBrightness(signal *dbus.Signal) error {
   log.Println("Get Set Screen Brightness signal")
-  brightChg = & pmpb.BacklightBrightnessChange{}
+  brightChg := &pmpb.BacklightBrightnessChange{}
   if err := dbusutil.DecodeSignal(signal, brightChg); err != nil {
     return err
   }
@@ -91,7 +94,7 @@ func (bm *ScreenBrightnessManager) HandleSetScreenBrightness(signal *dbus.Signal
 
 func (bm *ScreenBrightnessManager) HandleSetKeyboardBrightness(signal *dbus.Signal) error {
   log.Println("Get Set Keyboard Brightness signal")
-  brightChg = & pmpb.BacklightBrightnessChange{}
+  brightChg := &pmpb.BacklightBrightnessChange{}
   if err := dbusutil.DecodeSignal(signal, brightChg); err != nil {
     return err
   }
