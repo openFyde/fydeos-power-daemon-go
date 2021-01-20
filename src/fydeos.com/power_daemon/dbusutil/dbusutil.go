@@ -55,3 +55,11 @@ func DecodeSignal(sig *dbus.Signal, sigResult proto.Message) error {
   }
   return nil
 }
+
+func GetPMObject(conn *dbus.Conn) dbus.BusObject {
+  return conn.Object(PowerManagerName, PowerManagerPath)
+}
+
+func GetPMMethod(method string) string {
+  return PowerManagerInterface + "." + method
+}

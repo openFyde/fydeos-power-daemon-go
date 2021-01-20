@@ -6,37 +6,18 @@ import (
   "context"
   "runtime"
   "time"
+  "log"
   "github.com/godbus/dbus"
   "fydeos.com/power_daemon/dbusutil"
   "fydeos.com/power_daemon/suspend_manager"
 )
 
-// Debug related begin
-const debug = true
-
-func trace() string{
-    pc, _, _, ok := runtime.Caller(2)
-    if !ok { return "?"}
-
-    fn := runtime.FuncForPC(pc)
-    return fn.Name()
-}
-
-func dPrintln(format string, a ...interface{}) {
-  if debug {
-    fmt.Printf("%s:(%s) ", time.Now().Local(), trace())
-    fmt.Printf(format, a...)
-    fmt.Println("")
-  }
-}
-//Debug related end
 
 func main() {
   time.Sleep(1000 * time.Millisecond)
   conn, err := dbus.ConnectSystemBus(dbus.WithSignalHandler(dbus.NewSequentialSignalHandler()))
   if err != nil {
-    dPrintln("Connect system bus error:%w", err)
-    os.Exit(1)
+    log.Fatalf("Connect system bus error:%w", err)
   }
   defer conn.Close()
   ctx,cancel := context.WithCancel(context.Background())
@@ -44,7 +25,7 @@ func main() {
   sigServer := dbusutil.NewSignalServer(ctx, conn)
   suspendManager := suspend_manager.NewSuspendManager(ctx, conn)
   if err := suspendManager.Register(sigServer); err != nil {
-    dPrintln("suspend manager register error:%w", err)
+    log.Fatalf("suspend manager register error:%w", err)
   }
   defer suspendManager.UnRegister(sigServer)
   sigServer.StartWorking()
