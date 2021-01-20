@@ -33,7 +33,7 @@ type ScreenBrightnessManager struct {
   need_store_keyboard bool
 }
 
-func getHWConfig(name string) string, error {
+func getHWConfig(name string) (string, error) {
   fi, err := os.Lstat(pathConfig)
   if err != nil || !fi.IsDir() {
     return errors.New("%s or %s is not exist", pathConfig, name)
@@ -60,7 +60,7 @@ func saveHWConfig(name string, value string) error {
 }
 
 func NewScreenBrightnessManager(ctx context.Context, conn *dbus.Conn) (bm *ScreenBrightnessManager) {
-  bm := &ScreenBrightnessManager{
+  bm = &ScreenBrightnessManager{
       ctx, dbusutil.GetPMObject(conn), defaultBrightness, false, 0, false
   }
   if value, err := GetHWConfig(fileBrightness); err == nil {
@@ -111,7 +111,7 @@ func (bm *ScreenBrightnessManager) SetScreenBrightness() error {
   req = &pmpb.SetBacklightBrightnessRequest{
     Percent: &bm.screen_brightness,
     Transition: &pmpb.SetBacklightBrightnessRequest_INSTANT,
-    Cause: &pmpb.BacklightBrightnessChange_MODEL
+    Cause: &pmpb.BacklightBrightnessChange_MODEL,
   }
   return dbusutil.CallProtoMethod(bm.ctx, bm.obj, dbusutil.GetPMMethod(methdSetScreenBrightness), req, nil)
 }
