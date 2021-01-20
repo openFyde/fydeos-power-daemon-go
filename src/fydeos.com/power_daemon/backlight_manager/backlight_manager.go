@@ -5,7 +5,8 @@ import (
   "log"
   "os"
   "os/exec"
-  "errors"
+  "time"
+  "fmt"
   "github.com/godbus/dbus"
   "strconv"
   "io/ioutil"
@@ -36,7 +37,7 @@ type ScreenBrightnessManager struct {
 func getHWConfig(name string) (string, error) {
   fi, err := os.Lstat(pathConfig)
   if err != nil || !fi.IsDir() {
-    return errors.New("%s or %s is not exist", pathConfig, name)
+    return fmt.Errorf("%s or %s is not exist", pathConfig, name)
     err = os.Mkdir(pathConfig, os.ModeDir)
     if err != nil {
       log.Fatalf("failed to create dirctory:%s, error:%w", pathConfig, err)
@@ -45,8 +46,9 @@ func getHWConfig(name string) (string, error) {
   if !fi.IsDir() {
     log.Fatalf("%s is supposed to be a dirctory, but not", pathConfig)
   }
-  if buf, o_err := ioutil.ReadFile(pathConfig + "/" + name); o_err != nil {
-    return "", o_err
+  buf, err := ioutil.ReadFile(pathConfig + "/" + name)
+  if err != nil {
+    return "", err
   }
   return string(buf), nil
 }
@@ -110,10 +112,12 @@ func (bm *ScreenBrightnessManager) HandleSetKeyboardBrightness(signal *dbus.Sign
 
 func (bm *ScreenBrightnessManager) SetScreenBrightness() error {
   log.Printf("Set screen brightness to: %v", bm.screen_brightness)
-  req = &pmpb.SetBacklightBrightnessRequest{
+  trans := pmpb.SetBacklightBrightnessRequest_INSTANT
+  cause := pmpb.BacklightBrightnessChange_MODEL
+  req := &pmpb.SetBacklightBrightnessRequest{
     Percent: &bm.screen_brightness,
-    Transition: &pmpb.SetBacklightBrightnessRequest_INSTANT,
-    Cause: &pmpb.BacklightBrightnessChange_MODEL,
+    Transition: &trans,
+    Cause: &cause,
   }
   return dbusutil.CallProtoMethod(bm.ctx, bm.obj, dbusutil.GetPMMethod(methdSetScreenBrightness), req, nil)
 }
