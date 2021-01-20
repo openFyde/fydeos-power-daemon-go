@@ -2,8 +2,6 @@ package dbusutil
 
 import (
   "context"
-  "time"
-  "fmt"
   "log"
   "github.com/godbus/dbus"
 )

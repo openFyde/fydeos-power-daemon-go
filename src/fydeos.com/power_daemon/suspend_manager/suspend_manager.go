@@ -5,8 +5,6 @@ import (
   "os"
   "os/exec"
   "time"
-  "runtime"
-  "fmt"
   "log"
   "errors"
   "github.com/godbus/dbus"
