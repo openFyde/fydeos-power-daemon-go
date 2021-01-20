@@ -37,7 +37,7 @@ type ScreenBrightnessManager struct {
 func getHWConfig(name string) (string, error) {
   fi, err := os.Lstat(pathConfig)
   if err != nil || !fi.IsDir() {
-    return fmt.Errorf("%s or %s is not exist", pathConfig, name)
+    return "",fmt.Errorf("%s or %s is not exist", pathConfig, name)
     err = os.Mkdir(pathConfig, os.ModeDir)
     if err != nil {
       log.Fatalf("failed to create dirctory:%s, error:%w", pathConfig, err)
@@ -113,7 +113,7 @@ func (bm *ScreenBrightnessManager) HandleSetKeyboardBrightness(signal *dbus.Sign
 func (bm *ScreenBrightnessManager) SetScreenBrightness() error {
   log.Printf("Set screen brightness to: %v", bm.screen_brightness)
   trans := pmpb.SetBacklightBrightnessRequest_INSTANT
-  cause := pmpb.BacklightBrightnessChange_MODEL
+  cause := pmpb.SetBacklightBrightnessRequest_MODEL
   req := &pmpb.SetBacklightBrightnessRequest{
     Percent: &bm.screen_brightness,
     Transition: &trans,
@@ -140,8 +140,8 @@ func (bm *ScreenBrightnessManager) Register(sigServer *dbusutil.SignalServer) er
   var sbl_handler, kbl_handler dbusutil.SignalHandler
   sbl_handler = func(sig *dbus.Signal) error {return bm.HandleSetScreenBrightness(sig)}
   kbl_handler = func(sig *dbus.Signal) error {return bm.HandleSetKeyboardBrightness(sig)}
-  sigServer.RegisterSignalHandler(sigScreenBrightnessChanged, sbl)
-  sigServer.RegisterSignalHandler(sigKeyBoardBrightnessChanged, kbl)
+  sigServer.RegisterSignalHandler(sigScreenBrightnessChanged, sbl_handler)
+  sigServer.RegisterSignalHandler(sigKeyBoardBrightnessChanged, kbl_handler)
   log.Println("Register brightness manager")
   return nil
 }
