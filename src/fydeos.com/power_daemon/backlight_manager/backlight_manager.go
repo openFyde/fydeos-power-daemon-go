@@ -35,13 +35,10 @@ type ScreenBrightnessManager struct {
 }
 
 func getHWConfig(name string) (string, error) {
+  log.Printf("get config:%s", name);
   fi, err := os.Lstat(pathConfig)
   if err != nil || !fi.IsDir() {
     return "",fmt.Errorf("%s or %s is not exist", pathConfig, name)
-    err = os.Mkdir(pathConfig, os.ModeDir)
-    if err != nil {
-      log.Fatalf("failed to create dirctory:%s, error:%w", pathConfig, err)
-    }
   }
   if !fi.IsDir() {
     log.Fatalf("%s is supposed to be a dirctory, but not", pathConfig)
@@ -50,10 +47,12 @@ func getHWConfig(name string) (string, error) {
   if err != nil {
     return "", err
   }
+  log.Printf("get config:%s, value:%s", name, buf)
   return string(buf), nil
 }
 
 func saveHWConfig(name string, value string) error {
+  log.Printf("save config %s:%s", name, value)
   _, err := os.Lstat(pathConfig)
   if err != nil {
     err = os.Mkdir(pathConfig, os.ModeDir)
@@ -70,10 +69,14 @@ func NewScreenBrightnessManager(ctx context.Context, conn *dbus.Conn) (bm *Scree
   if value, err := getHWConfig(fileBrightness); err == nil {
     log.Printf("read hardware config; screen brightness:%s", value)
     bm.screen_brightness, _ = strconv.ParseFloat(value, 64)
+  }else {
+    log.Printf("read error:", err)
   }
   if value, err := getHWConfig(fileKeyboardBrightness); err == nil {
     log.Printf("read hardware config; keyboard brightness:%s", value)
     bm.keyboard_brightness, _ = strconv.ParseFloat(value, 64)
+  }else {
+    log.Printf("read error:", err)
   }
   return
 }
@@ -157,5 +160,6 @@ func (bm *ScreenBrightnessManager) UnRegister(sigServer *dbusutil.SignalServer) 
       log.Printf("Get error when save %s, error: %w", fileKeyboardBrightness, err)
     }
   }
+  log.Println("Unregister brightness manager")
   return nil
 }
