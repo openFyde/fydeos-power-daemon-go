@@ -60,9 +60,8 @@ func saveHWConfig(name string, value string) error {
 }
 
 func NewScreenBrightnessManager(ctx context.Context, conn *dbus.Conn) (bm *ScreenBrightnessManager) {
-  bm = &ScreenBrightnessManager{
-      ctx, dbusutil.GetPMObject(conn), defaultBrightness, false, 0, false
-  }
+  bm = &ScreenBrightnessManager{ctx, dbusutil.GetPMObject(conn),
+      defaultBrightness, false, 0, false}
   if value, err := GetHWConfig(fileBrightness); err == nil {
     log.Printf("read hardware config; screen brightness:%s", value)
     bm.screen_brightness, _ = strconv.ParseFloat(value, 64)
