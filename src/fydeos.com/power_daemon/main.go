@@ -4,6 +4,7 @@ import (
   "context"
   "time"
   "log"
+  "os"
   "github.com/godbus/dbus"
   "fydeos.com/power_daemon/dbusutil"
   "fydeos.com/power_daemon/suspend_manager"
@@ -11,7 +12,10 @@ import (
 
 
 func main() {
+  log.SetOutput(os.Stdout)
+  log.Println("Waiting for power manager init...")
   time.Sleep(1000 * time.Millisecond)
+  log.Println("Trying connect system bus")
   conn, err := dbus.ConnectSystemBus(dbus.WithSignalHandler(dbus.NewSequentialSignalHandler()))
   if err != nil {
     log.Fatalf("Connect system bus error:%w", err)
