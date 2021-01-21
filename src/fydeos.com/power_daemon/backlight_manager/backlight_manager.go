@@ -22,6 +22,7 @@ const (
   fileBrightness = "ScreenBrightness"
   fileKeyboardBrightness = "KeyBoardBrightness"
   defaultBrightness = 60.0
+  minBrightness = 10.0
   backlightTool = "/usr/bin/backlight_tool"
 )
 
@@ -85,7 +86,7 @@ func (bm *ScreenBrightnessManager) HandleSetScreenBrightness(signal *dbus.Signal
     return err
   }
   if (brightChg.GetCause() == pmpb.BacklightBrightnessChange_USER_REQUEST) {
-    if bm.screen_brightness != brightChg.GetPercent() {
+    if brightChg.GetPercent() > minBrightness && bm.screen_brightness != brightChg.GetPercent() {
       bm.screen_brightness = brightChg.GetPercent()
       bm.need_store_screen = true
     }
