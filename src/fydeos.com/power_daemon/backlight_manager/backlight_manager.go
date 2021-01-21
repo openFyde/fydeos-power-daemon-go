@@ -18,7 +18,7 @@ const (
   sigScreenBrightnessChanged = "ScreenBrightnessChanged"
   sigKeyBoardBrightnessChanged = "KeyboardBrightnessChanged"
   methdSetScreenBrightness = "SetScreenBrightness"
-  pathConfig = "/usr/share/oem/.hwconfig"
+  pathConfig = "/mnt/stateful_partition/unencrypted/hwconfig"
   fileBrightness = "ScreenBrightness"
   fileKeyboardBrightness = "KeyBoardBrightness"
   defaultBrightness = 60.0
