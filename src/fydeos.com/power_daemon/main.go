@@ -5,7 +5,7 @@ import (
   "time"
   "log"
   "os"
-  "github.com/godbus/dbus"
+  "github.com/godbus/dbus/v5"
   "fydeos.com/power_daemon/dbusutil"
   "fydeos.com/power_daemon/suspend_manager"
   "fydeos.com/power_daemon/backlight_manager"

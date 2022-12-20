@@ -7,7 +7,7 @@ import (
   "os/exec"
   "time"
   "fmt"
-  "github.com/godbus/dbus"
+  "github.com/godbus/dbus/v5"
   "strconv"
   "io/ioutil"
   pmpb "chromiumos/system_api/power_manager_proto"

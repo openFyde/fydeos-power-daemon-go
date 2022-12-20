@@ -7,7 +7,7 @@ import (
   "time"
   "log"
   "errors"
-  "github.com/godbus/dbus"
+  "github.com/godbus/dbus/v5"
   pmpb "chromiumos/system_api/power_manager_proto"
   "fydeos.com/power_daemon/dbusutil"
 )
